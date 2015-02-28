@@ -1,0 +1,29 @@
+
+---------------------
+Requirement:
+---------------------
+
+The most important requirement are the shared lib of Monkey's Audio Codec, Audacious 3.4.x and headers.
+
+
+--------------------
+Compile:
+--------------------
+$ ./autogen.sh
+$ ./configure
+$ make
+
+-------------------
+Install
+------------------
+
+$ make install
+
+PLAY APE FILES:
+
+You need to restart your audacious media player when you finished the installation, so it can reload
+the input plugins.
+
+
+It is really easy, huh? Enjoy it!
+

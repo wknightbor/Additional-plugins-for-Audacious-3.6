@@ -712,6 +712,12 @@ bool AutoCueLoader::load (const char * cue_filename, VFSFile & file, String & ti
 			//if(tlist[i]!=NULL)
 			{
 				tlist[i].set_int(Tuple::Track, i+1);
+				if(cd.TrackNames[i]!=NULL)
+					tlist[i].set_str( Tuple::Title, cd.TrackNames[i]);
+				if(i < cd.PerformerNumber && cd.Performers[i]!=NULL)
+					tlist[i].set_str( Tuple::Artist, cd.Performers[i]);
+				if(cd.CDTitle!=NULL)
+					tlist[i].set_str( Tuple::Album, cd.CDTitle);
 
 				items.append (String(flist[i]), std::move (tlist[i]));
 

@@ -1,4 +1,4 @@
-SUBDIRS = src po
+SUBDIRS = src
 
 DISTCLEAN = buildsys.mk config.h config.log config.status extra.mk
 

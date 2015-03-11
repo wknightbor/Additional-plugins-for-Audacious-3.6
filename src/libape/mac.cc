@@ -44,7 +44,7 @@ public:
     void cleanup ();
 
     bool is_our_file (const char * filename, VFSFile & file);
-    Tuple read_tuple (const char * filename, VFSFile & file);
+    bool read_tag (const char * filename, VFSFile & file, Tuple * tuple, Index<char> * image);
     bool play (const char * filename, VFSFile & file);
 };
 
@@ -268,38 +268,43 @@ bool APEPlugin::is_our_file (const char * fname, VFSFile & file)
 	return TRUE;
 }
 
-Tuple APEPlugin::read_tuple (const char * filename, VFSFile & file)
+bool APEPlugin::read_tag (const char * filename, VFSFile & file, Tuple * tuple, Index<char> * image)
 {
 	bool stream = (file.fsize () < 0);
 
-	IAPEDecompress* APED;
-	int error;
-	VFSCIO vfs;
-	vfs.setvfs(&file);
-	APED = CreateIAPEDecompressEx(static_cast<CIO*>(&vfs), &error);
-
-	if(APED == NULL)
+	if(tuple != NULL)
 	{
-		AUDERR("APED == NULL error unable to create APED class %d\n",error);
-		return Tuple();
+		IAPEDecompress* APED;
+		int error;
+		VFSCIO vfs;
+		vfs.setvfs(&file);
+		APED = CreateIAPEDecompressEx(static_cast<CIO*>(&vfs), &error);
+
+		if(APED == NULL)
+		{
+			AUDERR("APED == NULL error unable to create APED class %d\n",error);
+			return false;
+		}
+
+		tuple->set_filename (filename);
+		tuple->set_str( Tuple::Codec,  "Monkey's Audio");
+		tuple->set_str( Tuple::Quality, "Loss less");
+		tuple->set_int( Tuple::Bitrate, APED->GetInfo(APE_DECOMPRESS_AVERAGE_BITRATE) );
+		tuple->set_int( Tuple::Length, APED->GetInfo(APE_INFO_LENGTH_MS) );
+
+		delete APED;
+
+		if (stream)
+			tuple->fetch_stream_info (file);
+
+        if (! stream && file.fseek (0, VFS_SEEK_SET) != 0)
+            return false;
 	}
 
-	Tuple tuple;
-	tuple.set_filename (filename);
-	tuple.set_str( Tuple::Codec,  "Monkey's Audio");
-	tuple.set_str( Tuple::Quality, "Loss less");
-	tuple.set_int( Tuple::Bitrate, APED->GetInfo(APE_DECOMPRESS_AVERAGE_BITRATE) );
-	tuple.set_int( Tuple::Length, APED->GetInfo(APE_INFO_LENGTH_MS) );
+	if (! stream)
+		audtag::read_tag (file, tuple, image);
 
-	delete APED;
-
-	if (! stream && ! file.fseek(0, (VFSSeekType)SEEK_SET))
-		audtag::tuple_read (tuple, file);
-
-	if (stream)
-		tuple.fetch_stream_info (file);
-
-	return tuple;
+	return true;
 }
 
 typedef struct {

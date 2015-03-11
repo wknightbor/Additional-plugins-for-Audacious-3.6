@@ -1,9 +1,11 @@
 
----------------------
-Requirement:
----------------------
+Installation Instructions
+*************************
 
-The most important requirement are the shared lib of Monkey's Audio Codec, Audacious 3.4.x and headers.
+To compile it you need Audacious 3.6 and libmaclib 4.11
+
+Libmaclib you can download from https://sourceforge.net/projects/maclib/
+For easy installation process on ubuntu or debian please, copy macadd/* to root directory of maclib source and run mk.sh
 
 
 --------------------
@@ -17,13 +19,10 @@ $ make
 Install
 ------------------
 
-$ make install
 
-PLAY APE FILES:
+After that you can copy files to its destination manualy or use these commands:
 
-You need to restart your audacious media player when you finished the installation, so it can reload
-the input plugins.
+$ sudo cp src/libape/libape.so /usr/lib/audacious/Container/libape.so
+$ sudo cp src/autocue/autocue.so /usr/lib/audacious/Container/autocue.so
 
-
-It is really easy, huh? Enjoy it!
-
+That's all

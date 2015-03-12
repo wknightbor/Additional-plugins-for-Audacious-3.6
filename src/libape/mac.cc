@@ -150,7 +150,7 @@ int VFSCIO::Read(void * pBuffer, unsigned int nBytesToRead, unsigned int * pByte
 	{
 		int64_t cur = vfs-> ftell();
 		*pBytesRead = (unsigned int)vfs->fread(pBuffer, 1, nBytesToRead);
-		if(nBytesToRead > *pBytesRead)
+		/*if(nBytesToRead > *pBytesRead)
 		{
 			if(!vfs ->feof())
 			{
@@ -162,7 +162,7 @@ int VFSCIO::Read(void * pBuffer, unsigned int nBytesToRead, unsigned int * pByte
 					AUDERR("After second attempt read %d bytes\n", *pBytesRead);
 				}
 			}
-		}
+		}*/
 		return 0;
 	}
 	return 1;

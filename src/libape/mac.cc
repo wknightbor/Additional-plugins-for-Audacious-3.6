@@ -148,7 +148,7 @@ int VFSCIO::Read(void * pBuffer, unsigned int nBytesToRead, unsigned int * pByte
 {
 	if(vfs!=0)
 	{
-		int64_t cur = vfs-> ftell();
+		//int64_t cur = vfs-> ftell();
 		*pBytesRead = (unsigned int)vfs->fread(pBuffer, 1, nBytesToRead);
 		/*if(nBytesToRead > *pBytesRead)
 		{

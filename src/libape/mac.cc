@@ -325,7 +325,7 @@ bool APEPlugin::read_tag (const char * filename, VFSFile & file, Tuple * tuple, 
 }
 */
 
-Tuple read_tuple (const char * filename, VFSFile & file)
+Tuple APEPlugin::read_tuple (const char * filename, VFSFile & file)
 {
 	bool stream = (file.fsize () < 0);
 

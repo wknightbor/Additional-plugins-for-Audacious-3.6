@@ -5,7 +5,7 @@ dnl ***
 dnl Initialize
 dnl ==========
 AC_PREREQ([2.59])
-AC_INIT([audacious-plugins], [3.6-beta1])
+AC_INIT([audacious-plugins], [3.6])
 AC_COPYRIGHT([Copyright (C) 2001-2015 Audacious developers and others])
 
 AC_DEFINE_UNQUOTED([PACKAGE], "$PACKAGE_NAME", [Name of package])
@@ -18,10 +18,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AUD_COMMON_PROGS
 
 BUILDSYS_SHARED_LIB
-
-dnl Headers and functions
-dnl =====================
-AC_CHECK_FUNCS([mkdtemp])
 
 dnl gettext
 dnl =======
@@ -76,7 +72,7 @@ CONTAINER_PLUGINS=""
 TRANSPORT_PLUGINS=""
 
 dnl AUTOCUE
-dnl ---
+dnl ============
 
 AC_ARG_ENABLE(autocue,
 [AS_HELP_STRING([--disable-autocue], [disable autocue support. (default=enabled)])],
@@ -86,10 +82,8 @@ AC_ARG_ENABLE(autocue,
 CONTAINER_PLUGINS="$CONTAINER_PLUGINS autocue"
 have_autocue=yes
 
-dnl XXX
-
 dnl LIBAPE
-dnl ---
+dnl ============
 
 AC_ARG_ENABLE(autocue,
 [AS_HELP_STRING([--disable-libape], [disable libape support. (default=enabled)])],
@@ -109,6 +103,22 @@ if test "x$enable_libape" != "xno"; then
 else
     AC_MSG_RESULT([*** maclib not found; LIBAPE plugin disabled])
 fi
+
+dnl FILTERPRO
+dnl ============
+
+AC_ARG_ENABLE(filterpro,
+[AS_HELP_STRING([--disable-filterpro], [disable filterpro support. (default=enabled)])],
+[enable_filterpro=$enableval],
+[enable_filterpro=auto])
+
+EFFECT_PLUGINS="$EFFECT_PLUGINS filterpro"
+have_filterpro=yes
+
+dnl *** End of all plugin checks ***
+
+plugindir=`pkg-config audacious --variable=plugin_dir`
+AC_SUBST(plugindir)
 
 dnl XXX
 
@@ -171,4 +181,8 @@ echo
 echo "  Container"
 echo "  ---------"
 echo "  Auto CUE playlist format (cue):         $have_autocue"
+echo
+echo "  Effect"
+echo "  ---------"
+echo "  Filter Pro :                            $have_filterpro"
 

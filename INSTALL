@@ -12,17 +12,13 @@ For easy installation process on ubuntu or debian please, copy macadd/* to root 
 Compile:
 --------------------
 $ ./autogen.sh
-$ ./configure
-$ make
+$ ./configure --prefix=/usr
+$ make -j
 
 -------------------
 Install
 ------------------
 
-
-After that you can copy files to its destination manualy or use these commands:
-
-$ sudo cp src/libape/libape.so /usr/lib/audacious/Container/libape.so
-$ sudo cp src/autocue/autocue.so /usr/lib/audacious/Container/autocue.so
+sudo make install
 
 That's all

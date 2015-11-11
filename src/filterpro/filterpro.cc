@@ -99,23 +99,64 @@ void FilterPro::cleanup ()
     buffer.clear ();
 }
 
+int filter_proc(float* in_buffer, float* out_buffer, size_t samples_num, uint32_t channel_num, bool finish)
+{
+	return 0;
+}
+
+int filter_flush()
+{
+	return 0;
+}
+
+int filter_init(uint32_t channel_num, uint32_t rate, const char* config, uint32_t configLen)
+{
+	return 0;
+}
+
 void FilterPro::start (int & channels, int & rate)
 {
 	/* TODO: add clean up if needed */
 
     int current_filter = aud_get_int ("filterpro", "filter");
 
-    if(current_filter < FILTERPRO_PRESET_NUM && current_filter>=0)
-    	filterPath = aud_get_str ("filterpro", int_to_str (current_filter));
+  	const char* paramterName;
+    switch(current_filter)
+    {
+    case FILTERPRO_PRESET1: paramterName = "preset_1"; break;
+    case FILTERPRO_PRESET2: paramterName = "preset_2"; break;
+    case FILTERPRO_PRESET3: paramterName = "preset_3"; break;
+    default:
+    	AUDERR ("Invalid preset index, moving to default preset_1\n");
+    	paramterName = "preset_1";
+    }
 
-    /* TODO: add filter parameter read */
+    filterPath = aud_get_str ("filterpro", paramterName);
+
+    VFSFile input_file;
+    if (! VFSFile::test_file (filterPath, VFS_EXISTS))
+    {
+    	input_file = VFSFile (filterPath, "r");
+    	Index<char> bufferpp = input_file.read_all ();
+
+    	if(filter_init(channels, rate, bufferpp.begin(), bufferpp.len()))
+    	{
+    		AUDERR ("Filter initialization failed\n");
+    	}
+    }
+    else
+    {
+    	AUDERR ("Unable to read filter configuration\n");
+    	if(filter_init(channels, rate, nullptr, 0))
+       	{
+       		AUDERR ("Filter initialization failed\n");
+       	}
+    }
 
     filter = current_filter;
     stored_channels = channels;
     current_rate = rate;
 }
-static bool sign = false;
-static int curchan = 0;
 
 Index<float> & FilterPro::filterprocess (Index<float> & data, bool finish)
 {
@@ -124,26 +165,9 @@ Index<float> & FilterPro::filterprocess (Index<float> & data, bool finish)
 
     buffer.resize ((int) (data.len ()));
 
-    /* TODO: add filter call code here */
-
-    const size_t size = data.len();
-    for(size_t i = 0 ; i < size; i++)
+    if(filter_proc(data.begin(), buffer.begin(), data.len()/stored_channels, stored_channels, finish))
     {
-    	if(sign)
-    	{
-    		buffer[i] = data[i];
-    	}else
-    	{
-    		buffer[i] = -data[i];
-    	}
-
-    	curchan++;
-    	if(curchan>=stored_channels)
-    	{
-    		sign = !sign;
-    		curchan = 0;
-    	}
-
+    	AUDERR ("Filter processing failed\n");
     }
 
     if (finish)
@@ -154,7 +178,11 @@ Index<float> & FilterPro::filterprocess (Index<float> & data, bool finish)
 
 bool FilterPro::flush (bool force)
 {
-	/* TODO: add flush code if needed */
+	if(filter_flush())
+	{
+		AUDERR ("Filter flush failed\n");
+		return false;
+	}
 
     return true;
 }
